@@ -1,0 +1,95 @@
+import java.util.*;
+import java.net.*;
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+public class TravelItineraryPlanner {
+    
+    private static Scanner scanner = new Scanner(System.in);
+
+    // Function to get user input
+    public static List<String> getDestinations() {
+        List<String> destinations = new ArrayList<>();
+        System.out.println("Enter the number of destinations: ");
+        int numDestinations = scanner.nextInt();
+        scanner.nextLine();  // Consume newline
+
+        for (int i = 0; i < numDestinations; i++) {
+            System.out.println("Enter destination " + (i + 1) + ": ");
+            String destination = scanner.nextLine();
+            destinations.add(destination);
+        }
+        return destinations;
+    }
+
+    // Function to get dates
+    public static String getDate(String type) {
+        System.out.println("Enter the " + type + " date (yyyy-MM-dd): ");
+        return scanner.nextLine();
+    }
+
+    // Calculate budget based on the number of days and preferences
+    public static double calculateBudget(int numDays, List<String> destinations, String accommodationType) {
+        double dailyCost = accommodationType.equalsIgnoreCase("hotel") ? 150 : 100;
+        return numDays * dailyCost + destinations.size() * 200;
+    }
+
+    // Fetch weather information using a mock function (replace with API integration)
+    public static void getWeatherInfo(String destination) {
+        // Example API request: "http://api.openweathermap.org/data/2.5/weather?q=" + destination + "&appid=YOUR_API_KEY"
+        System.out.println("Fetching weather information for " + destination + "...");
+        // Here, you would implement API fetching using HttpURLConnection or an external library like HttpClient.
+        System.out.println("Weather: Sunny (Mock Data)");
+    }
+
+    // Generate Google Maps link
+    public static void generateMapLink(String destination) {
+        try {
+            String mapUrl = "https://www.google.com/maps/search/?api=1&query=" + URLEncoder.encode(destination, "UTF-8");
+            System.out.println("Map link for " + destination + ": " + mapUrl);
+        } catch (UnsupportedEncodingException e) {
+            System.out.println("Error generating map link for " + destination);
+        }
+    }
+    // Calculate the number of days between start and end dates
+    public static int calculateNumberOfDays(String startDate, String endDate) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date start = dateFormat.parse(startDate);
+        Date end = dateFormat.parse(endDate);
+        long difference = end.getTime() - start.getTime();
+        return (int) (difference / (1000 * 60 * 60 * 24));
+    }
+
+    public static void main(String[] args) {
+        try {
+            // Step 1: Input destinations
+            List<String> destinations = getDestinations();
+
+            // Step 2: Input dates
+            String startDate = getDate("start");
+            String endDate = getDate("end");
+
+            // Step 3: Input preferences
+            System.out.println("Enter accommodation type (hotel/Airbnb): ");
+            String accommodationType = scanner.nextLine();
+
+            // Step 4: Calculate number of days
+            int numDays = calculateNumberOfDays(startDate, endDate);
+
+            // Step 5: Fetch weather, generate maps, and display budget
+            System.out.println("\n--- Travel Itinerary ---");
+            for (String destination : destinations) {
+                System.out.println("\nDestination: " + destination);
+                getWeatherInfo(destination);
+                generateMapLink(destination);
+            }
+            // Step 6: Calculate and display budget
+            double budget = calculateBudget(numDays, destinations, accommodationType);
+            System.out.println("\nEstimated Budget: $" + budget);
+            System.out.println("Number of days: " + numDays); 
+        } catch (ParseException e) {
+            System.out.println("Error parsing date. Please use the format yyyy-MM-dd.");
+        }
+    }
+}
